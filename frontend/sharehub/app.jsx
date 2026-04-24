@@ -206,13 +206,6 @@ function App() {
   }, [accessToken]);
 
   uEApp(() => {
-    if (session) return;
-    if (isLocalHostName(window.location.hostname)) return;
-
-    signInAsDemo();
-  }, [session]);
-
-  uEApp(() => {
     let attempts = 0;
     const maxAttempts = 40;
     const timer = setInterval(() => {
@@ -286,6 +279,8 @@ function App() {
     setSession(null);
     setMyListings([]);
     setAddressError('');
+    setAuthError('');
+    setView('home');
     localStorage.removeItem(AUTH_SESSION_KEY);
     localStorage.removeItem(LEGACY_AUTH_USER_KEY);
     if (window.google && window.google.accounts && window.google.accounts.id) {

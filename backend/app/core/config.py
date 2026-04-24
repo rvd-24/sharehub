@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     frontend_origin: str = "http://localhost:5500"
     google_client_id: str = ""
     database_url: str = "postgresql+asyncpg://sharehub_user:sharehub123@localhost:5432/sharehub"
-    auth_token_secret: str = "1cfa6dc0860d4ba87beccc0f4fb0d0e7652be837d900ff1ee62d13a3ff06b600"
+    auth_token_secret: str = ""
     auth_token_expire_hours: int = 168
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
