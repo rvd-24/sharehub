@@ -3,11 +3,11 @@ from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.backend.app.core.auth import create_access_token, get_current_user
-from backend.backend.app.core.config import get_settings
-from backend.backend.app.db import get_db
-from backend.backend.app.models.user import User
-from backend.backend.app.schemas.auth import GoogleAuthRequest, GoogleAuthResponse, UserAddressUpdate, UserOut
+from app.core.auth import create_access_token, get_current_user
+from app.core.config import get_settings
+from app.db import get_db
+from app.models.user import User
+from app.schemas.auth import GoogleAuthRequest, GoogleAuthResponse, UserAddressUpdate, UserOut
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 settings = get_settings()
