@@ -18,6 +18,7 @@ class User(Base):
     city: Mapped[str | None] = mapped_column(String(120), nullable=True)
     state: Mapped[str | None] = mapped_column(String(120), nullable=True)
     pin: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    phone_number: Mapped[str | None] = mapped_column(String(30), nullable=True)
     country: Mapped[str | None] = mapped_column(String(120), nullable=True)
     user_level: Mapped[str] = mapped_column(String(20), nullable=False, default="user", server_default="user")
     email_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)

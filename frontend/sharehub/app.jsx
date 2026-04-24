@@ -4,6 +4,33 @@ const API_BASE = window.SHAREHUB_API_BASE || 'http://localhost:4000';
 const GOOGLE_CLIENT_ID = window.GOOGLE_CLIENT_ID || '';
 const AUTH_SESSION_KEY = 'sharehub.auth.session';
 const LEGACY_AUTH_USER_KEY = 'sharehub.auth.user';
+const DEMO_DEVICE_KEY = 'sharehub.demo.device.id';
+
+function isLocalHostName(hostname) {
+  return hostname === 'localhost' || hostname === '127.0.0.1';
+}
+
+function getDemoDeviceId() {
+  const existing = localStorage.getItem(DEMO_DEVICE_KEY);
+  if (existing) return existing;
+
+  const generated =
+    (window.crypto && window.crypto.randomUUID && window.crypto.randomUUID()) ||
+    `demo-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
+  localStorage.setItem(DEMO_DEVICE_KEY, generated);
+  return generated;
+}
+
+async function parseResponseBodySafe(res) {
+  const raw = await res.text();
+  if (!raw) return {};
+
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return { detail: raw };
+  }
+}
 
 function App() {
   const [view, setView] = uSApp('home');
@@ -19,6 +46,7 @@ function App() {
   const [session, setSession] = uSApp(null);
   const [authError, setAuthError] = uSApp('');
   const [gisReady, setGisReady] = uSApp(false);
+  const [demoSigningIn, setDemoSigningIn] = uSApp(false);
   const [addressSaving, setAddressSaving] = uSApp(false);
   const [addressError, setAddressError] = uSApp('');
   const [publicListings, setPublicListings] = uSApp([]);
@@ -55,6 +83,38 @@ function App() {
       console.error('Failed to restore auth session', err);
     }
   }, []);
+
+  async function signInAsDemo() {
+    setDemoSigningIn(true);
+    setAuthError('');
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/demo`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ device_id: getDemoDeviceId() }),
+      });
+      const data = await parseResponseBodySafe(res);
+      if (!res.ok || !data.user || !data.access_token) {
+        throw new Error(data.detail || `Demo sign-in failed (HTTP ${res.status}).`);
+      }
+
+      persistSession({
+        user: data.user,
+        access_token: data.access_token,
+        token_type: data.token_type || 'bearer',
+      });
+
+      if (!userHasAddress(data.user)) {
+        setView('address');
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      }
+    } catch (err) {
+      console.error('Demo auth error:', err);
+      setAuthError(err.message || 'Unable to sign in with demo account.');
+    } finally {
+      setDemoSigningIn(false);
+    }
+  }
 
   async function loadPublicListings() {
     setPublicListingsLoading(true);
@@ -144,6 +204,13 @@ function App() {
         console.error('Profile load error:', err);
       });
   }, [accessToken]);
+
+  uEApp(() => {
+    if (session) return;
+    if (isLocalHostName(window.location.hostname)) return;
+
+    signInAsDemo();
+  }, [session]);
 
   uEApp(() => {
     let attempts = 0;
@@ -315,6 +382,8 @@ function App() {
           currentView={view}
           user={user}
           gisReady={gisReady}
+          demoSigningIn={demoSigningIn}
+          onDemoSignIn={signInAsDemo}
           onSignOut={signOut}
         />
       )}

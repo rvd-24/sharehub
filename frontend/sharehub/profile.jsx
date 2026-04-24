@@ -7,6 +7,7 @@ function AddressView({ go, user, onSaveAddress, saving = false, error = '' }) {
     city: '',
     state: '',
     pin: '',
+    phone_number: '',
     country: 'India',
   });
   const [localError, setLocalError] = uSP('');
@@ -18,6 +19,7 @@ function AddressView({ go, user, onSaveAddress, saving = false, error = '' }) {
       city: user?.city || '',
       state: user?.state || '',
       pin: user?.pin || '',
+      phone_number: user?.phone_number || '',
       country: user?.country || 'India',
     });
   }, [user]);
@@ -41,6 +43,7 @@ function AddressView({ go, user, onSaveAddress, saving = false, error = '' }) {
       city: form.city.trim(),
       state: form.state.trim(),
       pin: form.pin.trim(),
+      phone_number: form.phone_number.trim() || null,
       country: form.country.trim(),
     });
   };
@@ -126,6 +129,18 @@ function AddressView({ go, user, onSaveAddress, saving = false, error = '' }) {
                   className="w-full rounded-2xl border border-slate-line bg-white px-4 py-3 text-sm text-indigo-deep outline-none focus:border-coral"
                 />
               </div>
+              <div>
+                <label className="block text-sm font-medium text-indigo-deep mb-2">Phone number</label>
+                <input
+                  value={form.phone_number}
+                  onChange={event => setField('phone_number', event.target.value)}
+                  placeholder="9876543210"
+                  className="w-full rounded-2xl border border-slate-line bg-white px-4 py-3 text-sm text-indigo-deep outline-none focus:border-coral"
+                />
+              </div>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-indigo-deep mb-2">Country</label>
                 <input

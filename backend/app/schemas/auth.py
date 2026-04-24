@@ -5,6 +5,10 @@ class GoogleAuthRequest(BaseModel):
     credential: str
 
 
+class DemoAuthRequest(BaseModel):
+    device_id: str
+
+
 class UserOut(BaseModel):
     id: str
     email: EmailStr
@@ -19,6 +23,7 @@ class UserOut(BaseModel):
     city: str | None = None
     state: str | None = None
     pin: str | None = None
+    phone_number: str | None = None
     country: str | None = None
 
 
@@ -28,6 +33,7 @@ class UserAddressUpdate(BaseModel):
     city: str
     state: str
     pin: str
+    phone_number: str | None = None
     country: str = "India"
 
 
