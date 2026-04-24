@@ -2,11 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
-from app.api.routes_auth import router as auth_router
-from app.api.routes_health import router as health_router
-from app.api.routes_listings import router as listings_router
-from app.core.config import get_settings
-from app.db import Base, engine
+from backend.backend.app.api.routes_auth import router as auth_router
+from backend.backend.app.api.routes_health import router as health_router
+from backend.backend.app.api.routes_listings import router as listings_router
+from backend.backend.app.core.config import get_settings
+from backend.backend.app.db import Base, engine
 
 settings = get_settings()
 

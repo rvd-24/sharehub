@@ -3,11 +3,11 @@ from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.core.auth import get_current_user
-from app.db import get_db
-from app.models.listing import Listing
-from app.models.user import User
-from app.schemas.listing import ListingCreate, ListingOut, ListingUpdate
+from backend.backend.app.core.auth import get_current_user
+from backend.backend.app.db import get_db
+from backend.backend.app.models.listing import Listing
+from backend.backend.app.models.user import User
+from backend.backend.app.schemas.listing import ListingCreate, ListingOut, ListingUpdate
 
 router = APIRouter(prefix="/api/listings", tags=["listings"])
 

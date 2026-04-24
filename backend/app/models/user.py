@@ -1,7 +1,7 @@
 from sqlalchemy import Boolean, DateTime, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.db import Base
+from backend.backend.app.db import Base
 
 
 class User(Base):
