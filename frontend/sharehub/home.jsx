@@ -192,7 +192,6 @@ function CategoryBrowser({ go }) {
               style={{ animation: `fadeUp 500ms ${i * 70}ms cubic-bezier(.2,.9,.2,1) both` }}>
               <div className="flex items-start justify-between">
                 <div className="text-4xl">{c.icon}</div>
-                <Chip className="!bg-white/70 !text-indigo-deep">{c.count} items</Chip>
               </div>
               <h3 className="mt-4 text-xl font-bold text-indigo-deep">{c.name}</h3>
               <div className="mt-3 flex flex-wrap gap-1.5">
@@ -405,16 +404,6 @@ function SocialProof() {
   return (
     <section className="py-16 sm:py-24 bg-cream">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid sm:grid-cols-3 gap-6 mb-16">
-          {STATS.map(s => (
-            <div key={s.label} className="text-center sm:text-left">
-              <div className="font-sans font-bold text-indigo-deep tracking-tight" style={{ fontSize: 'clamp(36px, 5vw, 56px)' }}>
-                <CountOnView target={s.n} prefix={s.prefix || ''} suffix={s.suffix || ''} decimal={s.decimal} />
-              </div>
-              <div className="text-slate-soft mt-1">{s.label}</div>
-            </div>
-          ))}
-        </div>
         <div className="flex sm:grid sm:grid-cols-3 gap-4 overflow-x-auto sm:overflow-visible -mx-4 px-4 sm:mx-0 sm:px-0 pb-2">
           {TESTIMONIALS.slice(0, 3).map(t => (
             <div key={t.name} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-line/60 flex-shrink-0 w-80 sm:w-auto">
@@ -441,7 +430,7 @@ function Footer({ go }) {
   return (
     <footer className="bg-indigo-deep text-white pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid md:grid-cols-4 gap-10 mb-12">
+        <div className="grid md:grid-cols-3 gap-10 mb-12">
           <div>
             <Logo light />
             <p className="mt-4 text-slate-soft text-sm leading-relaxed max-w-xs">
@@ -463,17 +452,6 @@ function Footer({ go }) {
               <li><a href="#" className="hover:text-coral">Pricing</a></li>
               <li><a href="#" className="hover:text-coral">Support</a></li>
             </ul>
-          </div>
-          <div>
-            <div className="text-xs uppercase tracking-widest text-slate-soft/70 font-semibold mb-4">Follow</div>
-            <Chip tone="white">📱 Download App — coming soon</Chip>
-            <div className="flex gap-2 mt-4">
-              {['Instagram','Twitter','Linkedin'].map(n => (
-                <a key={n} href="#" className="w-9 h-9 rounded-full bg-cream hover:bg-coral flex items-center justify-center transition-colors">
-                  <Icon name={n} size={16} />
-                </a>
-              ))}
-            </div>
           </div>
         </div>
         <div className="border-t border-slate-line pt-6 flex flex-wrap justify-between gap-2 text-xs text-slate-soft">

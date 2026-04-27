@@ -525,25 +525,6 @@ function PricingL({ state, setState }) {
           </div>
         );})}
       </div>
-      <div className="mt-6 bg-white border border-slate-line rounded-2xl p-5 flex items-center gap-4">
-        <button onClick={() => setDepositOn(!depositOn)}
-          className={`w-11 h-6 rounded-full relative transition ${depositOn ? 'bg-indigo-deep' : 'bg-slate-line'}`}>
-          <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${depositOn ? 'left-5' : 'left-0.5'}`} />
-        </button>
-        <div className="flex-1">
-          <div className="font-semibold text-indigo-deep text-sm">Security deposit required?</div>
-          <div className="text-xs text-slate-soft mt-0.5">Recommended for items over ₹5,000.</div>
-        </div>
-        {depositOn && (
-          <div className="flex items-baseline gap-1">
-            <span className="text-slate-soft">₹</span>
-            <input type="number" value={state.depositAmount || ''}
-              onChange={e => setState(s => ({ ...s, depositAmount: Number(e.target.value) || 0 }))}
-              placeholder="2000"
-              className="w-24 text-right font-serif text-xl bg-transparent border-b border-slate-line/80 focus:border-indigo-deep outline-none py-1" />
-          </div>
-        )}
-      </div>
     </div>
   );
 }
@@ -633,46 +614,6 @@ function LocationL({ state, setState }) {
             className="w-full bg-transparent border-b border-slate-line/80 py-3 text-xl font-serif focus:border-indigo-deep outline-none" />
         </Field>
       </div>
-      <div className="mt-8">
-        <label className="block text-[11px] uppercase tracking-[0.14em] font-semibold text-slate-soft mb-3">Handover</label>
-        <div className="grid sm:grid-cols-3 gap-2">
-          {[
-            { id: 'pickup', t: 'Pickup only', d: 'Renter collects from you' },
-            { id: 'deliver', t: 'I can deliver', d: 'You drop off within radius' },
-            { id: 'both', t: 'Both', d: 'Let renter choose' },
-          ].map(o => {
-            const sel = state.handover === o.id;
-            return (
-              <button key={o.id} onClick={() => set('handover', o.id)}
-                className={`rounded-2xl p-4 text-left border transition min-h-[80px] ${
-                  sel ? 'bg-indigo-deep text-white border-indigo-deep' : 'bg-white border-slate-line hover:border-indigo-deep'
-                }`}>
-                <div className="font-semibold text-sm">{o.t}</div>
-                <div className={`text-[11px] mt-1 ${sel ? 'text-white/70' : 'text-slate-soft'}`}>{o.d}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-      {(state.handover === 'deliver' || state.handover === 'both') && (
-        <div className="mt-6 grid sm:grid-cols-2 gap-6 max-w-xl">
-          <Field label="Delivery radius">
-            <div className="flex items-center gap-3 pt-1 pb-3 border-b border-slate-line/80">
-              <button onClick={() => set('radius', Math.max(1, state.radius - 1))} className="w-9 h-9 rounded-full border border-slate-line">−</button>
-              <div className="flex-1 font-serif text-2xl">{state.radius}<span className="text-sm text-slate-soft ml-2 font-sans">km</span></div>
-              <button onClick={() => set('radius', state.radius + 1)} className="w-9 h-9 rounded-full border border-slate-line">+</button>
-            </div>
-          </Field>
-          <Field label="Delivery fee">
-            <div className="flex items-baseline gap-1">
-              <span className="text-slate-soft font-serif text-2xl">₹</span>
-              <input type="number" value={state.deliveryFee || ''} onChange={e => set('deliveryFee', Number(e.target.value) || 0)}
-                placeholder="150"
-                className="flex-1 bg-transparent border-b border-slate-line/80 py-2 text-2xl font-serif focus:border-indigo-deep outline-none" />
-            </div>
-          </Field>
-        </div>
-      )}
     </div>
   );
 }
