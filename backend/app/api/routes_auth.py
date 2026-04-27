@@ -2,13 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token
 from sqlalchemy.ext.asyncio import AsyncSession
-import hashlib
 
 from app.core.auth import create_access_token, get_current_user
 from app.core.config import get_settings
 from app.db import get_db
 from app.models.user import User
-from app.schemas.auth import DemoAuthRequest, GoogleAuthRequest, GoogleAuthResponse, UserAddressUpdate, UserOut
+from app.schemas.auth import GoogleAuthRequest, GoogleAuthResponse, UserAddressUpdate, UserOut
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 settings = get_settings()
@@ -31,53 +30,6 @@ def _serialize_user(user: User) -> UserOut:
         pin=user.pin,
         phone_number=user.phone_number,
         country=user.country,
-    )
-
-
-def _demo_user_id(device_id: str) -> str:
-    digest = hashlib.sha256(device_id.encode("utf-8")).hexdigest()
-    return f"demo_{digest[:24]}"
-
-
-def _demo_user_email(user_id: str) -> str:
-    return f"{user_id}@sharehubdemo.app"
-
-
-@router.post("/demo", response_model=GoogleAuthResponse)
-async def auth_demo(payload: DemoAuthRequest, db: AsyncSession = Depends(get_db)) -> GoogleAuthResponse:
-    device_id = payload.device_id.strip()
-    if not device_id:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="device_id is required.",
-        )
-
-    user_id = _demo_user_id(device_id)
-    demo_email = _demo_user_email(user_id)
-    user = await db.get(User, user_id)
-    if not user:
-        user = User(
-            id=user_id,
-            email=demo_email,
-            name="Demo User",
-            given_name="Demo",
-            family_name="User",
-            email_verified=True,
-        )
-        db.add(user)
-
-    user.email = demo_email
-    user.name = user.name or "Demo User"
-    user.given_name = user.given_name or "Demo"
-    user.family_name = user.family_name or "User"
-    user.email_verified = True
-
-    await db.commit()
-    await db.refresh(user)
-
-    return GoogleAuthResponse(
-        user=_serialize_user(user),
-        access_token=create_access_token(user.id),
     )
 
 

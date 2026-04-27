@@ -5,10 +5,6 @@ class GoogleAuthRequest(BaseModel):
     credential: str
 
 
-class DemoAuthRequest(BaseModel):
-    device_id: str
-
-
 class UserOut(BaseModel):
     id: str
     email: EmailStr

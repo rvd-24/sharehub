@@ -1,7 +1,7 @@
 // Homepage sections
 const { useState: uSH, useEffect: uEH, useRef: uRH } = React;
 
-function Navbar({ go, currentView, user, gisReady, demoSigningIn, onDemoSignIn, onSignOut }) {
+function Navbar({ go, currentView, user, gisReady, onSignOut }) {
   const [scrolled, setScrolled] = uSH(false);
   const [open, setOpen] = uSH(false);
   const googleBtnRef = uRH(null);
@@ -58,11 +58,6 @@ function Navbar({ go, currentView, user, gisReady, demoSigningIn, onDemoSignIn, 
           </nav>
           <div className="hidden md:flex items-center gap-3">
             {!user && <div ref={googleBtnRef} />}
-            {!user && (
-              <Btn variant="outline" size="sm" onClick={onDemoSignIn} disabled={demoSigningIn}>
-                {demoSigningIn ? 'Signing in...' : 'Continue as Demo'}
-              </Btn>
-            )}
             {!!user && (
               <>
                 <button onClick={() => go('address')} className="inline-flex items-center gap-2 rounded-full bg-white border border-slate-line px-3 py-1.5 hover:border-coral/40 transition-colors">
@@ -93,11 +88,6 @@ function Navbar({ go, currentView, user, gisReady, demoSigningIn, onDemoSignIn, 
             ))}
             <div className="flex gap-2 mt-2">
               {!user && <div ref={mobileGoogleBtnRef} className="flex-1" />}
-              {!user && (
-                <Btn variant="outline" size="sm" className="flex-1" onClick={onDemoSignIn} disabled={demoSigningIn}>
-                  {demoSigningIn ? 'Signing in...' : 'Demo Login'}
-                </Btn>
-              )}
               {!!user && <Btn variant="outline" size="sm" className="flex-1" onClick={onSignOut}>Sign Out</Btn>}
               <Btn variant="primary" size="sm" className="flex-1" onClick={() => { go('list'); setOpen(false); }}>List Free →</Btn>
             </div>
