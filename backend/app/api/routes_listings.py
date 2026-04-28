@@ -145,3 +145,20 @@ async def update_listing(
     )
     updated_listing = result.scalar_one()
     return _serialize_listing(updated_listing)
+
+
+@router.delete("/{listing_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_listing(
+    listing_id: int,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> None:
+    listing = await db.get(Listing, listing_id)
+    if not listing:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Listing not found.")
+
+    if listing.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You can delete only your listings.")
+
+    await db.delete(listing)
+    await db.commit()

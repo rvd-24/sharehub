@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, DateTime, String, func
+from sqlalchemy import Boolean, DateTime, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db import Base
@@ -13,6 +13,7 @@ class User(Base):
     picture: Mapped[str | None] = mapped_column(String(500), nullable=True)
     given_name: Mapped[str | None] = mapped_column(String(100), nullable=True)
     family_name: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    profile_description: Mapped[str | None] = mapped_column(Text, nullable=True)
     address_line1: Mapped[str | None] = mapped_column(String(255), nullable=True)
     address_line2: Mapped[str | None] = mapped_column(String(255), nullable=True)
     city: Mapped[str | None] = mapped_column(String(120), nullable=True)

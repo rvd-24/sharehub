@@ -10,3 +10,6 @@ __pycache__/
 *.pyo
 scripts/
 VPS_GUIDE.md
+frontend/Designs/
+*.pyc
+.pyc

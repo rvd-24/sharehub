@@ -19,9 +19,6 @@ function ListView({
   go,
   user,
   accessToken,
-  myListings,
-  myListingsLoading,
-  myListingsError,
   onSaveListing,
   fireConfetti,
   setFireConfetti,
@@ -29,7 +26,7 @@ function ListView({
   const [step, setStep] = uSL(0);
   const [state, setState] = uSL(() => createEmptyListingState());
   const [published, setPublished] = uSL(false);
-  const [editorOpen, setEditorOpen] = uSL(false);
+  const [editorOpen, setEditorOpen] = uSL(true);
   const [editingListingId, setEditingListingId] = uSL(null);
   const [saveBusy, setSaveBusy] = uSL(false);
   const [saveError, setSaveError] = uSL('');
@@ -68,17 +65,8 @@ function ListView({
     setEditorOpen(true);
   };
 
-  const startEditListing = (listing) => {
-    setState(listingToFormState(listing));
-    setEditingListingId(listing.id);
-    setPublished(false);
-    setSaveError('');
-    setStep(1);
-    setEditorOpen(true);
-  };
-
   const backToDashboard = () => {
-    setEditorOpen(false);
+    go('profile');
     setPublished(false);
     setSaveBusy(false);
     setSaveError('');
@@ -109,20 +97,6 @@ function ListView({
 
   if (!canManageListings) {
     return <ListAuthGateL go={go} message="Your saved session is missing a listing token. Sign out and sign back in to publish or edit listings." />;
-  }
-
-  if (!editorOpen) {
-    return (
-      <ListingDashboardL
-        go={go}
-        user={user}
-        listings={myListings}
-        loading={myListingsLoading}
-        error={myListingsError}
-        onCreate={startNewListing}
-        onEdit={startEditListing}
-      />
-    );
   }
 
   return (
@@ -169,6 +143,14 @@ function ListView({
         )}
       </div>
 
+      {!!saveError && (
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 pb-24">
+          <div className="rounded-2xl border border-coral/20 bg-coral-light px-4 py-3 text-sm text-coral-dark">
+            {saveError}
+          </div>
+        </div>
+      )}
+
       {step > 0 && step < 9 && (
         <div className="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-lg border-t border-slate-line/60 z-20">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
@@ -196,6 +178,42 @@ function ListView({
   );
 }
 
+function DeleteListingModalL({ listing, deleting, onCancel, onConfirm }) {
+  if (!listing) return null;
+
+  return (
+    <div className="fixed inset-0 z-[70] flex items-center justify-center px-4">
+      <button
+        type="button"
+        aria-label="Close confirmation"
+        className="absolute inset-0 bg-indigo-deep/35 backdrop-blur-[2px]"
+        onClick={deleting ? undefined : onCancel}
+      />
+      <div className="relative w-full max-w-md rounded-3xl border border-slate-line bg-white p-6 sm:p-7 shadow-2xl">
+        <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-red-50 text-red-600 border border-red-100">
+          <Icon name="Trash2" size={16} />
+        </div>
+        <h3 className="mt-4 text-2xl font-bold text-indigo-deep tracking-tight">Delete listing?</h3>
+        <p className="mt-2 text-sm text-slate-soft leading-relaxed">
+          You are about to permanently delete <span className="font-semibold text-indigo-deep">{listing.title}</span>.
+          This cannot be undone.
+        </p>
+        <div className="mt-6 flex items-center justify-end gap-2.5">
+          <Btn variant="outline" size="sm" onClick={onCancel} disabled={deleting}>Keep Listing</Btn>
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={deleting}
+            className="inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-[13px] font-medium transition-all bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {deleting ? 'Deleting…' : 'Delete'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ListAuthGateL({ go, message }) {
   return (
     <div className="view-fade min-h-screen bg-cream pt-28 pb-24">
@@ -216,7 +234,7 @@ function ListAuthGateL({ go, message }) {
   );
 }
 
-function ListingDashboardL({ go, user, listings, loading, error, onCreate, onEdit }) {
+function ListingDashboardL({ go, user, listings, loading, error, onCreate, onEdit, onDelete, deletingListingIds }) {
   return (
     <div className="view-fade min-h-screen bg-cream pt-28 pb-24">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -252,7 +270,13 @@ function ListingDashboardL({ go, user, listings, loading, error, onCreate, onEdi
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
             {listings.map(listing => (
-              <ListingCardL key={listing.id} listing={listing} onEdit={() => onEdit(listing)} />
+              <ListingCardL
+                key={listing.id}
+                listing={listing}
+                onEdit={() => onEdit(listing)}
+                onDelete={() => onDelete(listing)}
+                deleting={deletingListingIds.has(listing.id)}
+              />
             ))}
           </div>
         )}
@@ -273,14 +297,24 @@ function listingStatusMeta(status) {
   return { label: 'Approval In Progress', tone: 'default' };
 }
 
-function ListingCardL({ listing, onEdit }) {
+function ListingCardL({ listing, onEdit, onDelete, deleting }) {
   const category = CATEGORIES_SH.find(c => c.id === listing.category) || CATEGORIES_SH[0];
   const cover = listing.photo_urls && listing.photo_urls[0];
   const updated = new Date(listing.updated_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
   const statusInfo = listingStatusMeta(listing.status);
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-line/60 overflow-hidden shadow-sm">
+    <div className="relative bg-white rounded-3xl border border-slate-line/60 overflow-hidden shadow-sm">
+      <button
+        type="button"
+        onClick={onDelete}
+        disabled={deleting}
+        title="Delete listing"
+        aria-label="Delete listing"
+        className="absolute top-3 right-3 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/95 border border-red-200 text-red-600 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <Icon name="Trash2" size={14} />
+      </button>
       <div className={`${category.gradient} h-48 flex items-center justify-center`}>
         {cover ? (
           <img src={cover} alt={listing.title} className="w-full h-full object-cover" />
@@ -306,7 +340,7 @@ function ListingCardL({ listing, onEdit }) {
             <div className="text-coral font-bold text-2xl">{fmtINR(listing.daily_price)}</div>
             <div className="text-xs text-slate-soft">{listingConditionLabel(listing.condition)} · min {listing.min_duration} day{listing.min_duration === 1 ? '' : 's'}</div>
           </div>
-          <Btn variant="outline" size="sm" onClick={onEdit}>Edit Listing</Btn>
+          <Btn variant="outline" size="sm" onClick={onEdit} disabled={deleting}>{deleting ? 'Deleting…' : 'Edit Listing'}</Btn>
         </div>
       </div>
     </div>

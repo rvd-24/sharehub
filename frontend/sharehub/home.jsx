@@ -27,7 +27,7 @@ function Navbar({ go, currentView, user, gisReady, onSignOut }) {
       });
     }
 
-    if (mobileGoogleBtnRef.current) {
+    if (open && mobileGoogleBtnRef.current) {
       mobileGoogleBtnRef.current.innerHTML = '';
       window.google.accounts.id.renderButton(mobileGoogleBtnRef.current, {
         theme: 'outline',
@@ -37,7 +37,7 @@ function Navbar({ go, currentView, user, gisReady, onSignOut }) {
         text: 'signin_with',
       });
     }
-  }, [user, gisReady]);
+  }, [user, gisReady, open]);
   const links = [
     { label: 'Home', v: 'home' },
     { label: 'Browse', v: 'rent' },
@@ -60,7 +60,7 @@ function Navbar({ go, currentView, user, gisReady, onSignOut }) {
             {!user && <div ref={googleBtnRef} />}
             {!!user && (
               <>
-                <button onClick={() => go('address')} className="inline-flex items-center gap-2 rounded-full bg-white border border-slate-line px-3 py-1.5 hover:border-coral/40 transition-colors">
+                <button onClick={() => go('profile')} className="inline-flex items-center gap-2 rounded-full bg-white border border-slate-line px-3 py-1.5 hover:border-coral/40 transition-colors">
                   {user.picture ? (
                     <img src={user.picture} alt={user.name || 'Profile'} className="w-6 h-6 rounded-full object-cover" />
                   ) : (

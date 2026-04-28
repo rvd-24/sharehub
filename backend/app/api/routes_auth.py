@@ -23,6 +23,7 @@ def _serialize_user(user: User) -> UserOut:
         picture=user.picture,
         given_name=user.given_name,
         family_name=user.family_name,
+        profile_description=user.profile_description,
         address_line1=user.address_line1,
         address_line2=user.address_line2,
         city=user.city,
@@ -93,13 +94,24 @@ async def update_my_address(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> UserOut:
-    current_user.address_line1 = payload.address_line1.strip()
-    current_user.address_line2 = payload.address_line2.strip() if payload.address_line2 else None
-    current_user.city = payload.city.strip()
-    current_user.state = payload.state.strip()
-    current_user.pin = payload.pin.strip()
-    current_user.phone_number = payload.phone_number.strip() if payload.phone_number else None
-    current_user.country = payload.country.strip()
+    updates = payload.model_dump(exclude_unset=True)
+
+    if "address_line1" in updates:
+        current_user.address_line1 = payload.address_line1.strip() if payload.address_line1 else None
+    if "address_line2" in updates:
+        current_user.address_line2 = payload.address_line2.strip() if payload.address_line2 else None
+    if "city" in updates:
+        current_user.city = payload.city.strip() if payload.city else None
+    if "state" in updates:
+        current_user.state = payload.state.strip() if payload.state else None
+    if "pin" in updates:
+        current_user.pin = payload.pin.strip() if payload.pin else None
+    if "phone_number" in updates:
+        current_user.phone_number = payload.phone_number.strip() if payload.phone_number else None
+    if "country" in updates:
+        current_user.country = payload.country.strip() if payload.country else None
+    if "profile_description" in updates:
+        current_user.profile_description = payload.profile_description.strip() if payload.profile_description else None
 
     await db.commit()
     await db.refresh(current_user)

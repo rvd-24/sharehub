@@ -14,6 +14,7 @@ class UserOut(BaseModel):
     picture: str | None = None
     given_name: str | None = None
     family_name: str | None = None
+    profile_description: str | None = None
     address_line1: str | None = None
     address_line2: str | None = None
     city: str | None = None
@@ -24,13 +25,14 @@ class UserOut(BaseModel):
 
 
 class UserAddressUpdate(BaseModel):
-    address_line1: str
+    address_line1: str | None = None
     address_line2: str | None = None
-    city: str
-    state: str
-    pin: str
+    city: str | None = None
+    state: str | None = None
+    pin: str | None = None
     phone_number: str | None = None
-    country: str = "India"
+    country: str | None = None
+    profile_description: str | None = None
 
 
 class GoogleAuthResponse(BaseModel):

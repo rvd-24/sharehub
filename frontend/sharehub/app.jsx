@@ -288,6 +288,34 @@ function App() {
     return data;
   }
 
+  async function deleteListing(listingId) {
+    if (!accessToken) throw new Error('Sign in again to manage listings.');
+
+    const res = await fetch(`${API_BASE}/api/listings/${listingId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!res.ok) {
+      let message = 'Unable to delete listing.';
+      try {
+        const data = await res.json();
+        message = data.detail || message;
+      } catch (_) {
+        // Ignore JSON parsing errors for empty/non-JSON responses.
+      }
+      throw new Error(message);
+    }
+
+    setMyListings(prev => prev.filter(listing => listing.id !== listingId));
+    setPublicListings(prev => prev.filter(listing => listing.id !== listingId));
+    if (selectedListing && selectedListing.id === listingId) {
+      setSelectedListing(null);
+    }
+  }
+
   const go = (v, data) => {
     setView(v);
 
@@ -311,7 +339,7 @@ function App() {
   return (
     <div className={`transition-opacity duration-500 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
       <ConfettiSH fire={fireConfetti} />
-      {view !== 'list' && (
+      {view !== 'list' && view !== 'rent' && (
         <Navbar
           go={go}
           currentView={view}
@@ -340,15 +368,21 @@ function App() {
             error={addressError}
           />
         )}
+        {view === 'profile' && (
+          <ProfileView
+            go={go}
+            user={user}
+            listings={myListings}
+            loading={myListingsLoading}
+            error={myListingsError}
+          />
+        )}
         {view === 'rent' && (
           <RentView
             go={go}
-            listings={publicListings}
-            loading={publicListingsLoading}
-            error={publicListingsError}
-            initialFilter={selectedBrowseCategory}
-            wishlist={wishlist}
-            onToggleWish={toggleWish}
+            user={user}
+            gisReady={gisReady}
+            onSignOut={signOut}
           />
         )}
         {view === 'listing-detail' && (
@@ -368,6 +402,7 @@ function App() {
             myListingsLoading={myListingsLoading}
             myListingsError={myListingsError}
             onSaveListing={saveListing}
+            onDeleteListing={deleteListing}
             fireConfetti={fireConfetti}
             setFireConfetti={setFireConfetti}
           />
