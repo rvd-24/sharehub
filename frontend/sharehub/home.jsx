@@ -86,6 +86,15 @@ function Navbar({ go, currentView, user, gisReady, onSignOut }) {
                 {l.label}
               </button>
             ))}
+            {!!user && (
+              <button
+                type="button"
+                onClick={() => { go('profile'); setOpen(false); }}
+                className="text-left px-3 py-3 rounded-lg hover:bg-cream text-indigo-deep font-medium"
+              >
+                Profile Dashboard
+              </button>
+            )}
             <div className="flex gap-2 mt-2">
               {!user && <div ref={mobileGoogleBtnRef} className="flex-1" />}
               {!!user && <Btn variant="outline" size="sm" className="flex-1" onClick={onSignOut}>Sign Out</Btn>}

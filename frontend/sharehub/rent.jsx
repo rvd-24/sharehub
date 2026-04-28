@@ -115,8 +115,8 @@ function MobileBrowseShell({ go, user }) {
       <nav className="fixed bottom-0 inset-x-0 z-40 border-t border-[#e8dfda] bg-[#fcf9f8] px-4 py-3 shadow-[0_-4px_20px_rgba(168,107,77,0.04)] rounded-t-[1.25rem]">
         <div className="mx-auto flex max-w-md justify-around">
           <MobileNavItem icon="Home" label="Home" onClick={() => go('home')} />
-          <MobileNavItem icon="Compass" label="Discover" onClick={() => go('rent')} />
-          <MobileNavItem icon="Hourglass" label="Waitlist" active onClick={() => go('rent')} />
+          <MobileNavItem icon="Compass" label="Browse" active onClick={() => go('rent')} />
+          <MobileNavItem icon="PlusCircle" label="List" onClick={() => go('list')} />
           <MobileNavItem icon="UserRound" label="Profile" onClick={() => go(user ? 'profile' : 'home')} />
         </div>
       </nav>

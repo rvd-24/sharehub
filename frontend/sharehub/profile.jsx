@@ -175,7 +175,7 @@ function ProfileView({ go, user, listings = [], loading = false, error = '' }) {
         </button>
         <button onClick={() => go('rent')} className="flex flex-col items-center text-stone-400 p-2 text-[10px] font-medium">
           <Icon name="Search" size={18} />
-          <span>Explore</span>
+          <span>Browse</span>
         </button>
         <button onClick={() => go('list')} className="flex flex-col items-center text-stone-400 p-2 text-[10px] font-medium">
           <Icon name="PlusCircle" size={18} />
