@@ -8,6 +8,7 @@ const LEGACY_AUTH_USER_KEY = 'sharehub.auth.user';
 function App() {
   const [view, setView] = uSApp('home');
   const [selectedListing, setSelectedListing] = uSApp(null);
+  const [listIntent, setListIntent] = uSApp(null);
   const [selectedBrowseCategory, setSelectedBrowseCategory] = uSApp('all');
   const [wishlist, setWishlist] = uSApp(new Set());
 
@@ -333,6 +334,12 @@ function App() {
       }
     }
 
+    if (v === 'list') {
+      setListIntent(data || null);
+    } else {
+      setListIntent(null);
+    }
+
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
@@ -375,6 +382,7 @@ function App() {
             listings={myListings}
             loading={myListingsLoading}
             error={myListingsError}
+            onDeleteListing={deleteListing}
           />
         )}
         {view === 'rent' && (
@@ -398,6 +406,7 @@ function App() {
             go={go}
             user={user}
             accessToken={accessToken}
+            listIntent={listIntent}
             myListings={myListings}
             myListingsLoading={myListingsLoading}
             myListingsError={myListingsError}

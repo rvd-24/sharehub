@@ -13,7 +13,7 @@ function profileMemberSince(user) {
   return `Joined ${joined.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}`;
 }
 
-function ProfileListingCard({ listing, go }) {
+function ProfileListingCard({ listing, go, onDelete }) {
   const category = CATEGORIES_SH.find(c => c.id === listing.category) || CATEGORIES_SH[0];
   const statusInfo = profileStatusMeta(listing.status);
   const cover = listing.photo_urls && listing.photo_urls[0];
@@ -29,6 +29,15 @@ function ProfileListingCard({ listing, go }) {
         <div className="absolute top-4 left-4">
           <span className={`${statusInfo.tone} text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full`}>{statusInfo.label}</span>
         </div>
+        <button
+          type="button"
+          onClick={() => onDelete(listing)}
+          className="absolute top-4 right-4 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-red-200 bg-white/95 text-red-600 shadow-sm transition hover:bg-red-50"
+          title="Delete listing"
+          aria-label="Delete listing"
+        >
+          <Icon name="Trash2" size={14} />
+        </button>
       </div>
       <div className="p-5">
         <div className="flex justify-between items-start gap-3 mb-2">
@@ -44,7 +53,7 @@ function ProfileListingCard({ listing, go }) {
         </div>
         <div className="pt-4 border-t border-stone-100 flex items-center justify-between">
           <span className="text-sm text-on-secondary-container">min {listing.min_duration || 1} day</span>
-          <button onClick={() => go('list')} className="text-primary font-button flex items-center gap-1">
+          <button onClick={() => go('list', { mode: 'edit', listing })} className="text-primary font-button flex items-center gap-1">
             Edit <Icon name="Pencil" size={14} />
           </button>
         </div>
@@ -53,7 +62,33 @@ function ProfileListingCard({ listing, go }) {
   );
 }
 
-function ProfileView({ go, user, listings = [], loading = false, error = '' }) {
+function ProfileView({ go, user, listings = [], loading = false, error = '', onDeleteListing }) {
+  const [confirmDeleteListing, setConfirmDeleteListing] = uSP(null);
+  const [deletingId, setDeletingId] = uSP(null);
+
+  const requestDelete = (listing) => {
+    setConfirmDeleteListing(listing);
+  };
+
+  const closeDeleteModal = () => {
+    if (deletingId) return;
+    setConfirmDeleteListing(null);
+  };
+
+  const confirmDelete = async () => {
+    if (!confirmDeleteListing || !onDeleteListing) return;
+
+    setDeletingId(confirmDeleteListing.id);
+    try {
+      await onDeleteListing(confirmDeleteListing.id);
+      setConfirmDeleteListing(null);
+    } catch (_) {
+      // Error surface is handled in app-level listing state.
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   if (!user) {
     return (
       <div className="view-fade min-h-screen pt-24 pb-24 bg-[#fcf9f8]">
@@ -162,11 +197,50 @@ function ProfileView({ go, user, listings = [], loading = false, error = '' }) {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-              {listings.map(listing => <ProfileListingCard key={listing.id} listing={listing} go={go} />)}
+              {listings.map(listing => (
+                <ProfileListingCard
+                  key={listing.id}
+                  listing={listing}
+                  go={go}
+                  onDelete={requestDelete}
+                />
+              ))}
             </div>
           )}
         </section>
       </main>
+
+      {!!confirmDeleteListing && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center px-4">
+          <button
+            type="button"
+            aria-label="Close confirmation"
+            className="absolute inset-0 bg-indigo-deep/35 backdrop-blur-[2px]"
+            onClick={closeDeleteModal}
+          />
+          <div className="relative w-full max-w-md rounded-3xl border border-slate-line bg-white p-6 sm:p-7 shadow-2xl">
+            <div className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-red-100 bg-red-50 text-red-600">
+              <Icon name="Trash2" size={16} />
+            </div>
+            <h3 className="mt-4 text-2xl font-bold text-indigo-deep tracking-tight">Delete listing?</h3>
+            <p className="mt-2 text-sm text-slate-soft leading-relaxed">
+              You are about to permanently delete <span className="font-semibold text-indigo-deep">{confirmDeleteListing.title}</span>.
+              This cannot be undone.
+            </p>
+            <div className="mt-6 flex items-center justify-end gap-2.5">
+              <Btn variant="outline" size="sm" onClick={closeDeleteModal} disabled={deletingId === confirmDeleteListing.id}>Keep Listing</Btn>
+              <button
+                type="button"
+                onClick={confirmDelete}
+                disabled={deletingId === confirmDeleteListing.id}
+                className="inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-[13px] font-medium transition-all bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {deletingId === confirmDeleteListing.id ? 'Deleting…' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <nav className="md:hidden fixed bottom-0 left-0 right-0 flex justify-around items-center px-4 py-2 bg-white/90 backdrop-blur-md z-40 border-t border-stone-100 shadow-[0_-10px_30px_rgba(0,0,0,0.03)]">
         <button onClick={() => go('home')} className="flex flex-col items-center text-stone-400 p-2 text-[10px] font-medium">

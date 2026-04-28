@@ -19,6 +19,7 @@ function ListView({
   go,
   user,
   accessToken,
+  listIntent,
   onSaveListing,
   fireConfetti,
   setFireConfetti,
@@ -88,6 +89,19 @@ function ListView({
       setSaveBusy(false);
     }
   };
+
+  uEL(() => {
+    if (!listIntent || listIntent.mode !== 'edit' || !listIntent.listing) {
+      return;
+    }
+
+    setState(listingToFormState(listIntent.listing));
+    setEditingListingId(listIntent.listing.id);
+    setPublished(false);
+    setSaveError('');
+    setStep(1);
+    setEditorOpen(true);
+  }, [listIntent]);
 
   uEL(() => { window.scrollTo(0, 0); }, [step, editorOpen]);
 
