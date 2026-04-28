@@ -80,6 +80,13 @@ function MobileBrowseShell({ go, user }) {
             <img src={BROWSE_MOBILE_HERO_IMAGE} alt="Community sharing" className="h-full w-full object-cover" />
           </div>
           <div className="max-w-sm space-y-4">
+            <div className="mx-auto inline-flex items-center gap-2 rounded-full bg-[#ffdbcc] px-4 py-1.5 text-[#6c391f]">
+              <Icon name="BadgeCheck" size={15} />
+              <span className="text-[12px] font-semibold">Launching Soon</span>
+            </div>
+            <h1 className="text-[34px] font-bold leading-[1.1] tracking-tight text-[#1c1b1b]" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+              Browsing is coming soon.
+            </h1>
             <h1 className="text-[22px] font-bold leading-tight text-[#1c1b1b]" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
               The smarter way to access high-quality gear.
             </h1>
